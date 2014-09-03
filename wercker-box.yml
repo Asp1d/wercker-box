@@ -1,0 +1,39 @@
+name: ur
+version: 0.0.1
+inherits: wercker/ubuntu12.04-webessentials@0.0.3
+type: service
+platform: ubuntu@14.04
+keywords:
+    - ruby
+    - rvm
+    - elasticsearch
+    - redis
+script: |
+    sudo apt-get update
+    sudo apt-get upgrade
+
+    sudo apt-get install openjdk-7-jre-headless -y
+    sudo wget -O /tmp/elasticsearch-1.2.0.deb https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.2.0.deb
+    sudo dpkg -i /tmp/elasticsearch-1.2.0.deb
+    sudo sed -i 's/# http.enabled: false/http.enabled: true/g' /etc/elasticsearch/elasticsearch.yml
+    sudo sed -i 's/# network.host: 192.168.0.1/network.host: $$HOST$$/g' /etc/elasticsearch/elasticsearch.yml
+
+    sudo apt-get install git zlib1g-dev libreadline-dev libqtwebkit-dev curl -y
+    sudo apt-get remove ruby1.9.1
+    curl -sSL https://get.rvm.io | bash -s stable
+    echo "bundler -v~>1.5.1" > $HOME/.rvm/gemsets/global.gems
+    source $HOME/.rvm/scripts/rvm
+    rvm install 2.1.2
+    rvm --default use 2.1.2
+    echo "gem: --no-rdoc --no-ri" >> $HOME/.gemrc
+    echo "RAILS_ENV=test" | sudo tee -a /etc/environment
+    echo "RACK_ENV=test" | sudo tee -a /etc/environment
+
+    sudo add-apt-repository ppa:chris-lea/redis-server -y
+    sudo apt-get -y install redis-server
+    redis-cli ping
+env:
+    WERCKER_ELASTICSEARCH_PORT: 9200
+    WERCKER_ELASTICSEARCH_HOST: $$HOST$$
+    WERCKER_ELASTICSEARCH_URL: $$HOST$$:9200
+    WERCKER_ELASTICSEARCH_VERSION: 1.2.0
