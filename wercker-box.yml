@@ -21,11 +21,12 @@ script: |
     sudo sed -i 's/# network.host: 192.168.0.1/network.host: $$HOST$$/g' /etc/elasticsearch/elasticsearch.yml
     sudo apt-get install git zlib1g-dev libreadline-dev libqtwebkit-dev curl -y
     sudo apt-get remove ruby1.9.1
+    gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
     curl -sSL https://get.rvm.io | bash -s stable
     echo "bundler -v~>1.5.1" > $HOME/.rvm/gemsets/global.gems
     source $HOME/.rvm/scripts/rvm
-    rvm install 2.1.2
-    rvm --default use 2.1.2
+    rvm install 2.1.5
+    rvm --default use 2.1.5
     echo "gem: --no-rdoc --no-ri" >> $HOME/.gemrc
     echo "RAILS_ENV=test" | sudo tee -a /etc/environment
     echo "RACK_ENV=test" | sudo tee -a /etc/environment
